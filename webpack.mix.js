@@ -1,4 +1,6 @@
 const mix = require('laravel-mix');
+const exec = require('child_process').exec;
+require('dotenv').config();
 
 /*
  |--------------------------------------------------------------------------
@@ -11,7 +13,31 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
-    .postCss('resources/css/app.css', 'public/css', [
-        //
-    ]);
+const glob = require('glob');
+const path = require('path');
+
+/*
+ |--------------------------------------------------------------------------
+ | Vendor assets
+ |--------------------------------------------------------------------------
+ */
+
+ function mixAssetsDir(query, cb) {
+  (glob.sync('resources/' + query) || []).forEach(f => {
+    f = f.replace(/[\\\/]+/g, '/');
+    cb(f, f.replace('resources', 'public'));
+  });
+}
+
+//mixAssetsDir(
+//  'vendors/js/**/*.js',
+//  (src, dest) => mix.scripts(src, dest)
+//);
+
+mix.version();
+
+mix
+  .js('resources/js/app.js', 'public/js')
+  .postCss('resources/css/app.css', 'public/css', [
+    //
+  ]);
